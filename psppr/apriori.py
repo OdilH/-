@@ -24,13 +24,24 @@ item_count = {item: 0 for item in unique_items}
 for transaction in transactions:
     for item in transaction:
         item_count[item] += 1
+# Генерация троек
+# triples = [(a, b, c) for i, a in enumerate(unique_items) for j, b in enumerate(unique_items[i+1:]) for c in unique_items[i+j+2:]]
+#
+#Подсчет троек в транзакциях
+# triple_count = {(a, b, c): 0 for a, b, c in triples}
+# for transaction in transactions:
+#     for a, b, c in triples:
+#         if a in transaction and b in transaction and c in transaction:
+#             triple_count[(a, b, c)] += 1
+
 
 # Определение порога
 threshold = 5
 frequent_items = {item: count for item, count in item_count.items() if count >= threshold}
-
+print(frequent_items)
 # Генерация пар
 pairs = [(a, b) for i, a in enumerate(unique_items) for b in unique_items[i+1:]]
+print(pairs)
 
 # Подсчет пар в транзакциях
 pair_count = {(a, b): 0 for a, b in pairs}
@@ -38,6 +49,7 @@ for transaction in transactions:
     for a, b in pairs:
         if a in transaction and b in transaction:
             pair_count[(a, b)] += 1
+print(pair_count)
 
 # Выбор часто встречающихся пар
 frequent_pairs = {pair: count for pair, count in pair_count.items() if count >= threshold}
