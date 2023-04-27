@@ -43,6 +43,7 @@ def naive_bayes(data, X):
     yes_count = sum([1 for row in data if row[-1] == '+'])
     no_count = total - yes_count
 
+    # Априорная вероятность
     p_yes = yes_count / total
     p_no = no_count / total
 
@@ -53,12 +54,15 @@ def naive_bayes(data, X):
         yes_count_feature = sum([1 for row in data if row[i] == X[i] and row[-1] == '+'])
         no_count_feature = sum([1 for row in data if row[i] == X[i] and row[-1] == '-'])
 
+        # Условные вероятности для нового столбца рассчитываются с помощью следующих строк кода:
         p_feature_given_yes = yes_count_feature / yes_count
         p_feature_given_no = no_count_feature / no_count
 
+        # Теперь рассчитаем произведения вероятностей для классов С1 и С2
         p_yes_given_X *= p_feature_given_yes
         p_no_given_X *= p_feature_given_no
 
+    # нормализуются
     p_X = p_yes_given_X + p_no_given_X
     p_yes_given_X /= p_X
     p_no_given_X /= p_X
@@ -69,10 +73,12 @@ def naive_bayes(data, X):
 p_yes_given_X1, p_no_given_X1 = naive_bayes(data, X1)
 print(f"Для X1: P(Уход=Да|X1) = {p_yes_given_X1:.3f}, P(Уход=Нет|X1) = {p_no_given_X1:.3f}")
 
-# Теперь вы можете использовать эту функцию для вычисления вероятности ухода постоянного читателя для каждого из наблюдений Х1, Х2, Х3 и Х4:
+# Теперь вы можете использовать эту функцию для вычисления вероятности ухода постоянного читателя для каждого из
+# наблюдений Х1, Х2, Х3 и Х4:
 
 for i, X in enumerate([X1, X2, X3, X4], start=1):
     p_yes_given_X, p_no_given_X = naive_bayes(data, X)
     print(f"Для X{i}: P(Уход=Да|X{i}) = {p_yes_given_X:.3f}, P(Уход=Нет|X{i}) = {p_no_given_X:.3f}")
 
-# Этот код выполнит расчеты, указанные в вашем примере, и выведет вероятности ухода для каждого из наблюдений Х1, Х2, Х3 и Х4.
+# Этот код выполнит расчеты, указанные в вашем примере, и выведет вероятности ухода для каждого из наблюдений Х1, Х2,
+# Х3 и Х4.

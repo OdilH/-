@@ -28,11 +28,8 @@ rmse = np.sqrt(mse)
 
 # Вычисляем коэффициент корреляции без np.corrcoef
 numerator_correlation = np.sum((x - mean_x) * (y - mean_y))
-denominator_correlation = np.sqrt(np.sum((x - mean_x)**2) * np.sum((y - mean_y)**2))
+denominator_correlation = np.sqrt(np.sum((x - mean_x) ** 2) * np.sum((y - mean_y) ** 2))
 correlation_coeff = numerator_correlation / denominator_correlation
-
-
-
 
 print("b0 =", b0)
 print("b1 =", b1)
