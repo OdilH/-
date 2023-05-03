@@ -1,106 +1,123 @@
-def get_alternative_table(table):
-    alternative_table = [['' for _ in range(10)] for _ in range(10)]
+import numpy as np
+
+
+def first(arr):
+    n = arr.shape[0]
+    ans = np.full((n, n), 'н', dtype='<U1')
+
+    for i in range(n):
+        for j in range(i, n):
+            ans[i][j] = 'x'
+
+    flag1 = False
+    flag2 = False
+
+    for i in range(1, n):
+        for j in range(i):
+            for z in range(5):
+                if arr[i][z] > arr[j][z]:
+                    flag1 = True
+                if arr[i][z] < arr[j][z]:
+                    flag2 = True
+
+            if flag1 and not flag2:
+                ans[i][j] = str(i + 1)
+            if not flag1 and flag2:
+                ans[i][j] = str(j + 1)
+
+            flag1 = False
+            flag2 = False
+
+    print("A", end='')
+    for i in range(n):
+        print(f"{i + 1:3}", end='')
+    print()
+
+    for i in range(n):
+        for j in range(n):
+            if j == 0:
+                print(f"{i + 1}", end=' ')
+            print(f"{ans[i][j]:3}", end='')
+        print()
+
+
+def second(arr, min, minpos):
     for i in range(10):
-        for j in range(10):
-            if j >= i:
-                alternative_table[i][j] = 'X'
-
-    for i in range(10):
-        for j in range(i + 1, 10):
-            first_flag = False
-            second_flag = False
-            for k in range(5):
-                if k == 0 or k == 3:
-                    if table[i][k] > table[j][k]:
-                        first_flag = True
-                    elif table[i][k] < table[j][k]:
-                        second_flag = True
-                else:
-                    if table[i][k] < table[j][k]:
-                        first_flag = True
-                    elif table[i][k] > table[j][k]:
-                        second_flag = True
-
-            if first_flag and not second_flag:
-                alternative_table[j][i] = str(i + 1)
-            elif not first_flag and second_flag:
-                alternative_table[j][i] = str(j + 1)
-            else:
-                alternative_table[j][i] = 'N'
-
-    return alternative_table
-
-
-def bottom_line(table, value, min_val):
-    for i in range(10):
-        if table[i][value] >= min_val:
-            print(i + 1, end=': ')
-            for k in range(5):
-                print(table[i][k], end='  ')
+        if arr[i][minpos - 1] >= min:
+            print(f"{i + 1}: ", end='')
+            for j in range(5):
+                print(arr[i][j], end=' ')
             print()
 
 
-def sub_optimization(table, value, min_val):
-    number = -1
-    priority = 0
-    answer = -1
+def third(arr):
+    min = 1000
+    minid = -1
+
     for i in range(10):
-        if table[i][value] >= min_val:
-            if table[i][priority] > number:
-                number = table[i][priority]
-                answer = i
+        if arr[i][2] >= 4 and abs(arr[i][4]) <= 60:
+            if abs(arr[i][0]) < min:
+                min = abs(arr[i][0])
+                minid = i
+            print(f"{i + 1}: ", end='')
+            for j in range(5):
+                print(arr[i][j], end=' ')
+            print()
+
+    print(f"Наилучший {minid + 1}: ", end='')
+    for j in range(5):
+        print(arr[minid][j], end=' ')
+
+
+def fourth(arr, ord):
+    n = 10
+    active = [True] * 10
 
     for i in range(5):
-        print(table[answer][i], end='  ')
-
-
-def lexicographic(table):
-    amount = 10
-    answer = 0
-    while amount > 1:
-        for i in range(5):
-            for j in range(9):
-                if table[answer][i] < table[j + 1][i] and (i == 0 or i == 3):
-                    answer = j + 1
-                    amount -= 1
-                elif table[answer][i] > table[j + 1][i] and (i != 0 and i != 3):
-                    answer = j + 1
-                    amount -= 1
-
-    for i in range(5):
-        print(table[answer][i], end='  ')
-
-
-if __name__ == '__main__':
-    table = [
-        [70000, 4, 4, 3, 2],
-        [145000, 5, 7, 10, 3],
-        [300000, 3, 3, 10, 1],
-        [200000, 5, 12, 9, 2],
-        [180000, 5, 4, 4, 6],
-        [290000, 5, 6, 8, 3],
-        [310000, 2, 2, 11, 2],
-        [90000, 7, 14, 3, 3],
-        [200000, 6, 10, 9, 4],
-        [100000, 7, 5, 8, 1]
-    ]
-
-    # Построение таблицы альтернатив
-
-    alternative_table = get_alternative_table(table)
-    for i in range(10):
+        max_val = max([arr[j][ord[i] - 1] for j in range(10) if active[j]])
         for j in range(10):
-            print(alternative_table[i][j], end=' ')
-        print()
-    # Оптимизация установлением нижней границы
-    print('==============================')
-    bottom_line(table, 0, 300000)
+            if arr[j][ord[i] - 1] != max_val and active[j]:
+                active[j] = False
+                n -= 1
+        if n == 1:
+            for j in range(10):
+                if active[j]:
+                    print(f"{j + 1}: ", end='')
+                    for z in range(5):
+                        print(arr[j][z], end=' ')
+                    print()
+                    return
 
-    # Субоптимизация
-    print('==============================')
-    sub_optimization(table, 3, 10)
 
-    # Лексикографическая оптимизация
-    print()
-    print('==============================')
-    lexicographic(table)
+data = np.array([
+    [-2500, -15, 20, 24, 7],
+    [-5000, -10, 10, 22, 8],
+    [-3500, -20, 8, 20, 6],
+    [-6000, -5, 7, 18, 7],
+    [-4500, -5, 9, 24, 9],
+    [-3000, -25, 6, 16, 5],
+    [-5500, -10, 8, 19, 7],
+    [-2500, -5, 7, 17, 8],
+    [-4000, -20, 7, 22, 6],
+    [-5500, -15, 10, 19, 9], ])
+
+ord_list = [5, 2, 1, 3, 4, 6]
+
+print("Таблица альтернатив:")
+first(data)
+print()
+print("------------------------------------------------------------------------------------------------")
+print()
+print("\nУстановка верхней границы 8 по критерию 3:")
+second(data, 8, 3)
+print()
+print("------------------------------------------------------------------------------------------------")
+print()
+print("\nСубоптимизация по критерию 1 с установкой границы 5 по критерию 3 и 60 по критерию 5:")
+third(data)
+print()
+print()
+print("------------------------------------------------------------------------------------------------")
+print("\n\nЛексикографическая оптимизация по критериям 5, 2, 1, 3, 4:")
+fourth(data, ord_list)
+
