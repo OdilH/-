@@ -1,166 +1,167 @@
-import openpyxl
-
-from collections import defaultdict
-
-my_path = r"C:\Users\footb\OneDrive\Рабочий стол\Учеба\4 семестр\Теория принятий решений (4 семестр)\Таблицы\table.xlsx"
-wb_obj = openpyxl.load_workbook(my_path)
-my_sheet_obj = wb_obj.active
-Arr1 = []
-Arr2 = []
-Arr3 = []
-Arr4 = []
-Arr5 = []
-Arr6 = []
-main1 = [[0 for x in range(10)] for y in range(10)]
-chet = my_sheet_obj.max_row
-for i in range(0, chet - 2):
-    main1[i][i] = "X"
-for i in range(2, chet):
-    Arr1.append(my_sheet_obj.cell(i, 3).value)  # Arr.append записывает строку в список Arr (столбец 1)
-    Arr2.append(my_sheet_obj.cell(i, 4).value)  # Столбец 2
-    Arr3.append(my_sheet_obj.cell(i, 5).value)
-    Arr4.append(my_sheet_obj.cell(i, 6).value)
-    Arr5.append(my_sheet_obj.cell(i, 7).value)  # Столбец 5
-    Arr6.append(my_sheet_obj.cell(i, 8).value)  # Столбец 6
+mas = [[0] * 10 for _ in range(10)]
 
 
-def Electra(porog):
-    for i in range(0, chet - 2):
-        a = Arr1[i]  # Записываем первый элемент 1/2/3/4/5/6/7/8/9/10 строки
-        b = Arr2[i]
-        c = Arr3[i]
-        d = Arr4[i]
-        e = Arr5[i]
-        r = Arr6[i]  # Записываем шестой элемент 1/2/3/4/5/6/7/8/9/10 строки
-        for j in range(i + 1, chet - 2):
-            a1 = Arr1[j]  # Записываем первый элемент 2/3/4/5/6/7/8/9/10 строки
-            b1 = Arr2[j]
-            c1 = Arr3[j]
-            d1 = Arr4[j]
-            e1 = Arr5[j]
-            r1 = Arr6[j]  # Записываем шестой элемент 2/3/4/5/6/7/8/9/10 строки
-            p = []
-            n = []
-            if a == a1:
-                p.append(0)
-                n.append(0)
-            elif a < a1:
-                p.append(0)
-                n.append(2)
-            elif a > a1:
-                p.append(2)
-                n.append(0)
-            if b == b1:
-                p.append(0)
-                n.append(0)
-            elif b < b1:
-                p.append(3)
-                n.append(0)
-            elif b > b1:
-                p.append(0)
-                n.append(3)
-            if c == c1:
-                p.append(0)
-                n.append(0)
-            elif c < c1:
-                p.append(5)
-                n.append(0)
-            elif c > c1:
-                p.append(0)
-                n.append(5)
-            if d == d1:
-                p.append(0)
-                n.append(0)
-            elif d < d1:
-                p.append(5)
-                n.append(0)
-            elif d > d1:
-                p.append(0)
-                n.append(5)
-            if e == e1:
-                p.append(0)
-                n.append(0)
-            elif e < e1:
-                p.append(0)
-                n.append(4)
-            elif e > e1:
-                p.append(4)
-                n.append(0)
-            if r == r1:
-                p.append(0)
-                n.append(0)
-            elif r < r1:
-                p.append(0)
-                n.append(2)
-            elif r > r1:
-                p.append(2)
-                n.append(0)
-            P = sum(p)
-            N = sum(n)
-            if P == 0:
-                main1[i][j] = "-"
-                main1[j][i] = float('inf')
-            elif N == 0:
-                main1[j][i] = "-"
-                main1[i][j] = float('inf')
-            else:
-                Dij = P / N
-                Dji = N / P
-                if Dij > 1:
-                    main1[i][j] = float('{:.2f}'.format(Dij))
-                if Dji > 1:
-                    main1[j][i] = float('{:.2f}'.format(Dji))
-    for i in range(0, chet - 2):  # Заполнение таблицы с учётом порога
-        for j in range(0, chet - 2):
-            if type(main1[i][j]) == str:
-                continue
-            if main1[i][j] < porog:
-                main1[i][j] = "-"
-    Vivod = [[str(e) for e in row] for row in main1]  # 115-119 вывод таблицы
-    lens = [max(map(len, col)) for col in zip(*Vivod)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in Vivod]
-    print('\n'.join(table))
+def compare(cr, f, s, x, y):
+    codef = [0] * 6
+    codes = [0] * 6
+    P = [0] * 6
+    N = [0] * 6
+    p = 0
+    n = 0
 
+    for i in range(6):
+        if f[i] < cr[i]['scale'][0]:
+            codef[i] = cr[i]['code'][0]
+        elif f[i] > cr[i]['scale'][1]:
+            codef[i] = cr[i]['code'][2]
+        else:
+            codef[i] = cr[i]['code'][1]
 
-def get_graph(main1, porog):  # Получаем граф предпочтений
-    tab = defaultdict(list)
-    V = len(main1)
-    for i in range(0, len(main1)):
-        for j in range(0, len(main1[0])):
-            if main1[i][j] == 'X' or main1[i][j] == '-':
-                continue
-            if main1[i][j] > porog:
-                tab[i + 1].append(j + 1)
-    return tab
+        if s[i] < cr[i]['scale'][0]:
+            codes[i] = cr[i]['code'][0]
+        elif s[i] > cr[i]['scale'][1]:
+            codes[i] = cr[i]['code'][2]
+        else:
+            codes[i] = cr[i]['code'][1]
 
+        if codef[i] > codes[i]:
+            P[i] = cr[i]['weight']
+            N[i] = 0
+        if codef[i] < codes[i]:
+            P[i] = 0
+            N[i] = cr[i]['weight']
 
-def print_graph(G):  # Красивый вывод графа предпочтений
-    for node, sub_nodes in G.items():
-        print(str(node) + ": [", end="")
-        for sub_node in sub_nodes:
-            print(str(sub_node) + " ", end="")
-        print("]")
+    print(f"P{x + 1}{y + 1} = ", end="")
+    for i in range(6):
+        print(P[i], end="")
+        p += P[i]
+        if i != 5:
+            print(" + ", end="")
+    print(f" = {p}")
 
+    print(f"N{x + 1}{y + 1} = ", end="")
+    for i in range(6):
+        print(N[i], end="")
+        n += N[i]
+        if i != 5:
+            print(" + ", end="")
+    print(f" = {n}")
 
-Vvod = 1
-while Vvod != 0:
-    print('Меню:')
-    print('1 - Вывести матрицу предпочтений')
-    print('2 - Установить порог и вывести матрицу предпочтений')
-    print('0 - Завершение работы программы')
-    Vvod = int(input())
-    if Vvod == 1:
-        Electra(0)
-        tab = get_graph(main1, 0)
-        print_graph(tab)
-    elif Vvod == 2:
-        print('Установите порог: ')
-        porog = int(input())
-        Electra(porog)
-        tab = get_graph(main1, porog)
-        print_graph(tab)
-    elif Vvod == 0:
-        print('Работы программы завершена успешно, спасибо!')
+    print(f"D{x + 1}{y + 1} = P{x + 1}{y + 1}/N{x + 1}{y + 1} = {p}/{n}", end="")
+
+    if p == 0:
+        if n != 0:
+            print(" = infinity > 1, accept")
+            return "B"
+        else:
+            print(" < 1, reject")
+    elif n == 0:
+        print(" undefined, reject")
+    elif p / n > 1:
+        print(" > 1, accept")
+        ret = round(p / n * 10) / 10
+        return str(ret)
     else:
-        print('Ошибка!')
+        print(" <= 1, reject")
+
+    print()
+    return "-"
+
+
+def build():
+    for i in range(10):
+        isend = all(mas[i][j] <= 0 for j in range(10))
+        if isend:
+            for j in range(10):
+                if mas[j][i] != 0:
+                    mas[j][i] += 1
+
+
+def recurse(x):
+    for i in range(10):
+        isconnected = any(mas[i][j] == x for j in range(10))
+        if isconnected:
+            for j in range(10):
+                if mas[j][i] != 0:
+                    mas[j][i] = x + 1
+
+
+def print_levels(x):
+    max_val = max(mas[i][j] for i in range(10) for j in range(10))
+
+    if max_val == 0:
+        return 0
+
+    print(f"\n\nLevel number {x}: ", end="")
+
+    for i in range(10):
+        for j in range(10):
+            if mas[i][j] == max_val:
+                print(i + 1, end=" ")
+                for z in range(10):
+                    mas[i][z] = 0
+
+    return print_levels(x + 1)
+
+
+def main():
+    data = [
+        [-300, 3, 5, 180, -10, 1],
+        [-120, 5, 6, 200, 0, 3],
+        [-100, 1, 9, 1000, -60, 3],
+        [-50, 3, 4, 100, -30, 10],
+        [-150, 5, 2, 500, -20, 1],
+        [-200, 4, 5, 700, -10, 5],
+        [-180, 10, 4, 300, 0, 3],
+        [-500, 2, 4, 2500, -60, 1],
+        [-300, 1, 8, 200, -120, 1],
+        [-450, 7, 2, 600, -45, 4]
+    ]
+
+    names = [
+        "Subscription price",
+        "People for joint viewing",
+        "Rating",
+        "Number of positions",
+        "Download delay",
+        "Devices per account"
+    ]
+
+    weights = [5, 2, 5, 4, 2, 3]
+
+    ispos = [False, True, True, True, False, True]
+
+    scale = [
+        [-299, -100],
+        [2, 4],
+        [5, 7],
+        [150, 499],
+        [-59, -30],
+        [2, 4]
+    ]
+
+    cr = [
+        {
+            'name': names[i],
+            'weight': weights[i],
+            'ispos': ispos[i],
+            'scale': scale[i],
+            'code': [1, 2, 3]
+        }
+        for i in range(6)
+    ]
+
+    for i in range(6):
+        print(
+            f"Criterion: {cr[i]['name']}, weight: {cr[i]['weight']}, trend upwards: {cr[i]['ispos']}, scale: 1) <{cr[i]['scale'][0]}, 2) from {cr[i]['scale'][0]} to {cr[i]['scale'][1]} 3) >{cr[i]['scale'][1]}")
+        print()
+
+    for i in range(10):
+        print(f"\n{i + 1} ", end="")
+        for j in range(6):
+            code = 1 if data[i][j] < cr[j]['scale'][0] else 3 if data[i][j] > cr[j]['scale'][1] else 2
+            print(code, end=" ")
+
+
+if __name__ == "__main__":
+    main()
