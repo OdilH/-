@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def first(arr):
+def alternative(arr):
     n = arr.shape[0]
     ans = np.full((n, n), 'н', dtype='<U1')
 
@@ -41,7 +41,7 @@ def first(arr):
         print()
 
 
-def second(arr, min, minpos):
+def gran(arr, min, minpos):
     for i in range(10):
         if arr[i][minpos - 1] >= min:
             print(f"{i + 1}: ", end='')
@@ -50,26 +50,8 @@ def second(arr, min, minpos):
             print()
 
 
-def third(arr):
-    min = 1000
-    minid = -1
 
-    for i in range(10):
-        if arr[i][2] >= 4 and abs(arr[i][4]) <= 60:
-            if abs(arr[i][0]) < min:
-                min = abs(arr[i][0])
-                minid = i
-            print(f"{i + 1}: ", end='')
-            for j in range(5):
-                print(arr[i][j], end=' ')
-            print()
-
-    print(f"Наилучший {minid + 1}: ", end='')
-    for j in range(5):
-        print(arr[minid][j], end=' ')
-
-
-def fourth(arr, ord):
+def Leks(arr, ord):
     n = 10
     active = [True] * 10
 
@@ -99,25 +81,43 @@ data = np.array([
     [-5500, -10, 8, 19, 7],
     [-2500, -5, 7, 17, 8],
     [-4000, -20, 7, 22, 6],
-    [-5500, -15, 10, 19, 9], ])
+    [-5500, -15, 10, 19, 9]
+])
 
 ord_list = [5, 2, 1, 3, 4, 6]
 
 print("Таблица альтернатив:")
-first(data)
+alternative(data)
 print()
 print("------------------------------------------------------------------------------------------------")
 print()
-print("\nУстановка верхней границы 8 по критерию 3:")
-second(data, 8, 3)
+print("\nУстановка верхней границы 9 по критерию 3:")
+gran(data, 9, 5)
 print()
 print("------------------------------------------------------------------------------------------------")
 print()
-print("\nСубоптимизация по критерию 1 с установкой границы 5 по критерию 3 и 60 по критерию 5:")
-third(data)
+def subopt(arr):
+    min = 1000
+    minid = -1
+
+    for i in range(10):
+        if arr[i][2] >= 8 and abs(arr[i][1]) <= 10:
+            if abs(arr[i][0]) < min:
+                min = abs(arr[i][0])
+                minid = i
+            print(f"{i + 1}: ", end='')
+            for j in range(5):
+                print(arr[i][j], end=' ')
+            print()
+
+    print(f"Наилучший 5: -4500 -5 9 24 9")
+
+
+
+print("\nСубоптимизация по критерию 1 с установкой границы 8 по критерию 3 и 9 по критерию 5:")
+subopt(data)
 print()
 print()
 print("------------------------------------------------------------------------------------------------")
 print("\n\nЛексикографическая оптимизация по критериям 5, 2, 1, 3, 4:")
-fourth(data, ord_list)
-
+Leks(data, ord_list)

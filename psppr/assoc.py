@@ -1,69 +1,59 @@
-transactions = [['11111', 'Слива', 'Салат', 'Помидоры'],
-                ['12222', 'Сельдерей', 'Конфеты'],
-                ['13333', 'Конфеты'],
-                ['14444', 'Яблоки', 'Морковь', 'Помидоры', 'Картофель', 'Конфеты'],
-                ['15555', 'Яблоки', 'Апельсины', 'Салат', 'Конфеты', 'Помидоры'],
-                ['16666', 'Персики', 'Сельдерей', 'Помидоры'],
-                ['17777', 'Фасоль', 'Салат', 'Помидоры'],
-                ['18888', 'Апельсин', 'Салат', 'Морковь', 'Помидоры', 'Конфеты'],
-                ['19999', 'Яблоки', 'Бананы', 'Сливы', 'Морковь', 'Помидоры', 'Конфеты', 'Лук'],
-                ['10000', 'Яблоки', 'Картофель']
+from collections import defaultdict
+from itertools import combinations, chain
+
+
+def itemsets_frequency(transactions):
+    frequency = defaultdict(int)
+    for transaction in transactions:
+        for itemset in chain(*[combinations(transaction, i + 1) for i, _ in enumerate(transaction)]):
+            frequency[itemset] += 1
+    return frequency
+
+
+def association_rules(transactions, min_support=0, min_confidence=0):
+    frequency = itemsets_frequency(transactions)
+    transaction_num = len(transactions)
+
+    itemset_keys = list(frequency.keys())
+    for itemset in itemset_keys:
+        support = frequency[itemset] / transaction_num
+        if support < min_support:
+            continue
+
+        for i in range(1, len(itemset)):
+            for antecedent in combinations(itemset, i):
+                antecedent = tuple(sorted(antecedent))
+                consequent = tuple(sorted(set(itemset) - set(antecedent)))
+                if len(antecedent) == 0 or len(consequent) == 0:
+                    continue
+
+                if frequency[antecedent] == 0:
+                    continue
+
+                confidence = frequency[itemset] / frequency[antecedent]
+                if confidence < min_confidence:
+                    continue
+
+                if frequency[consequent] == 0:
+                    continue
+
+                lift = confidence / (frequency[consequent] / transaction_num)
+
+                yield (antecedent, consequent, support, confidence, lift)
+
+
+transactions = [['Слива', 'Салат', 'Помидоры'],
+                ['Сельдерей', 'Конфеты'],
+                ['Конфеты'],
+                ['Яблоки', 'Морковь', 'Помидоры', 'Картофель', 'Конфеты'],
+                ['Яблоки', 'Апельсины', 'Салат', 'Конфеты', 'Помидоры'],
+                ['Персики', 'Сельдерей', 'Помидоры'],
+                ['Фасоль', 'Салат', 'Помидоры'],
+                ['Апельсин', 'Салат', 'Морковь', 'Помидоры', 'Конфеты'],
+                ['Яблоки', 'Бананы', 'Сливы', 'Морковь', 'Помидоры', 'Конфеты', 'Лук'],
+                ['Яблоки', 'Картофель']
                 ]
 
-# Calculate the frequency of items in transactions
-item_counts = {}
-for transaction in transactions:
-    for item in transaction:
-        if item not in item_counts:
-            item_counts[item] = 1
-        else:
-            item_counts[item] += 1
-
-# Calculate the number of transactions
-transaction_count = len(transactions)
-
-# Calculate the support for each item
-support = {}
-for item, count in item_counts.items():
-    support[item] = count / transaction_count
-
-# Calculate the confidence for each item
-confidence = {}
-for transaction in transactions:
-    for item in item_counts:
-        if item in transaction:
-            if item not in confidence:
-                confidence[item] = {}
-            for other_item in item_counts:
-                if other_item != item and other_item in transaction:
-                    if other_item not in confidence[item]:
-                        confidence[item][other_item] = 0
-                    confidence[item][other_item] += 1
-
-for item, related_items in confidence.items():
-    item_support = support[item]
-    for related_item, count in related_items.items():
-        confidence[item][related_item] = count / item_support
-
-# Calculate the lift for each item
-lift = {}
-for item, related_items in confidence.items():
-    for related_item, confidence_value in related_items.items():
-        if item not in lift:
-            lift[item] = {}
-        lift[item][related_item] = confidence_value / support[related_item]
-
-
-print("Поддержка:")
-for item, support_value in support.items():
-    print("\t{}: {:.2f}".format(item, support_value))
-
-print("\nДостоверность:")
-for item, related_items in confidence.items():
-    for related_item, confidence_value in related_items.items():
-        print("\t{} -> {}: {:.2f}".format(item, related_item, confidence_value))
-
-print("\nЛифт:")
-for item, related_items in lift.items():
-    for related_item, lift_value in related_items.items():
-        print("\t{} -> {}: {:.2f}".format(item, related_item, lift_value))
+rules = list(association_rules(transactions, min_support=0.2, min_confidence=0.6))
+for rule in rules:
+    print(f"Правило: {rule[0]} => {rule[1]}, Поддержка: {rule[2]}, Достоверность: {rule[3]}, Лифт: {rule[4]}")
